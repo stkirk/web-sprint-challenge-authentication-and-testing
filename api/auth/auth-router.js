@@ -1,7 +1,15 @@
 const router = require("express").Router();
 
+const brcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const { TOKEN_SECRET } = require("../../config/secrets");
+const {
+  validateUserPayload,
+  checkUniqueUsername,
+  checkExistingUser,
+} = require("../middleware/validation");
+
 router.post("/register", (req, res) => {
-  res.json("register");
   /*
     IMPLEMENT
     You are welcome to build additional middlewares to help with the endpoint's functionality.
