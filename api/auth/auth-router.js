@@ -8,6 +8,7 @@ const {
   checkUniqueUsername,
   checkExistingUser,
 } = require("../middleware/validation");
+const Users = require("../users/users-model");
 
 router.post(
   "/register",
@@ -17,7 +18,9 @@ router.post(
     try {
       const { username, password } = req.body;
       const hash = brcrypt.hashSync(password, 8);
-      res.json(hash);
+      const user = { username, password: hash };
+      const createdUser = await Users.add(user);
+      res.status(201).json(createdUser);
     } catch (err) {
       next(err);
     }
