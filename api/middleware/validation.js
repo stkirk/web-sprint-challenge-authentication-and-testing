@@ -1,12 +1,11 @@
-// 3- On FAILED registration due to `username` or `password` missing from the request body,
-// the response body should include a string exactly as follows: "username and password required".
-
+const db = require("../../data/dbConfig");
 // 4- On FAILED registration due to the `username` being taken,
 // the response body should include a string exactly as follows: "username taken".
 
 const validateUserPayload = (req, res, next) => {
-  console.log("validating user payload...");
-  next();
+  if (!req.body.username || !req.body.password) {
+    next({ status: 422, message: "username and password required" });
+  } else next();
 };
 
 const checkUniqueUsername = (req, res, next) => {
