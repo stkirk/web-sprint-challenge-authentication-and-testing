@@ -1,6 +1,4 @@
 const Users = require("../users/users-model");
-// 4- On FAILED registration due to the `username` being taken,
-// the response body should include a string exactly as follows: "username taken".
 
 const validateUserPayload = (req, res, next) => {
   if (!req.body.username || !req.body.password) {
