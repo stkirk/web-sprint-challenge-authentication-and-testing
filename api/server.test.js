@@ -1,11 +1,13 @@
 const request = require("supertest");
 const db = require("../data/dbConfig");
 const server = require("./server");
+const brcrypt = require("bcryptjs");
 
 const leto = {
   username: "dukeletoatreides",
   password: "1234",
 };
+const hash = brcrypt.hashSync(leto.password, 8);
 
 const gurney = {
   username: "gurneyhalleck",
@@ -24,7 +26,7 @@ beforeAll(async () => {
 
 beforeEach(async () => {
   await db("users").truncate();
-  await db("users").insert(leto);
+  await db("users").insert({ username: leto.username, password: hash });
 });
 
 // Write your tests here
@@ -51,5 +53,17 @@ describe("[POST] /api/auth/register", () => {
     const res = await request(server).post("/api/auth/register").send(gurney);
     expect(res.body.id).toBe(2);
     expect(res.body.username).toBe("gurneyhalleck");
+  });
+});
+
+describe("[POST] /api/auth/login", () => {
+  it("responds with a token if credentials are valid", async () => {
+    const res = await request(server).post("/api/auth/login").send(leto);
+    expect(res.body.token).toBeDefined();
+  });
+  it("responds with 401 invalid credentials if credentials are invalid", async () => {
+    const res = await request(server).post("/api/auth/login").send(gurney);
+    expect(res.status).toBe(401);
+    expect(res.body.message).toBe("invalid credentials");
   });
 });
