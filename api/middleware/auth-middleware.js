@@ -17,9 +17,18 @@ const checkUniqueUsername = async (req, res, next) => {
   }
 };
 
-const checkExistingUser = (req, res, next) => {
-  console.log("checking if user exists...");
-  next();
+const checkExistingUser = async (req, res, next) => {
+  try {
+    const existing = await Users.findBy({ username: req.body.username });
+    if (existing[0]) {
+      req.body.user = existing[0];
+      next();
+    } else {
+      next({ status: 401, message: "invalid credentials" });
+    }
+  } catch (err) {
+    next(err);
+  }
 };
 
 module.exports = {

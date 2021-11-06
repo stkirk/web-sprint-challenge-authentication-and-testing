@@ -2,8 +2,6 @@ const router = require("express").Router();
 
 const brcrypt = require("bcryptjs");
 const generateToken = require("../utils/generateToken");
-const jwt = require("jsonwebtoken");
-const { TOKEN_SECRET } = require("../../config/secrets");
 const {
   validateUserPayload,
   checkUniqueUsername,
@@ -53,9 +51,20 @@ router.post(
   }
 );
 
-router.post("/login", validateUserPayload, checkExistingUser, (req, res) => {
-  res.json(generateToken(req.body));
-  /*
+router.post(
+  "/login",
+  validateUserPayload,
+  checkExistingUser,
+  (req, res, next) => {
+    const user = req.body.user;
+    const validated = brcrypt.compareSync(req.body.password, user.password);
+    if (validated) {
+      const token = generateToken(user);
+      res.json({ message: `welcome, ${user.username}`, token });
+    } else {
+      next({ status: 401, message: "invalid credentials" });
+    }
+    /*
     IMPLEMENT
     You are welcome to build additional middlewares to help with the endpoint's functionality.
 
@@ -78,6 +87,7 @@ router.post("/login", validateUserPayload, checkExistingUser, (req, res) => {
     4- On FAILED login due to `username` not existing in the db, or `password` being incorrect,
       the response body should include a string exactly as follows: "invalid credentials".
   */
-});
+  }
+);
 
 module.exports = router;
