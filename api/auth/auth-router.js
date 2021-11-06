@@ -9,8 +9,19 @@ const {
   checkExistingUser,
 } = require("../middleware/validation");
 
-router.post("/register", (req, res) => {
-  /*
+router.post(
+  "/register",
+  validateUserPayload,
+  checkUniqueUsername,
+  async (req, res, next) => {
+    try {
+      const { username, password } = req.body;
+      const hash = brcrypt.hashSync(password, 8);
+      res.json(hash);
+    } catch (err) {
+      next(err);
+    }
+    /*
     IMPLEMENT
     You are welcome to build additional middlewares to help with the endpoint's functionality.
     DO NOT EXCEED 2^8 ROUNDS OF HASHING!
@@ -35,9 +46,10 @@ router.post("/register", (req, res) => {
     4- On FAILED registration due to the `username` being taken,
       the response body should include a string exactly as follows: "username taken".
   */
-});
+  }
+);
 
-router.post("/login", (req, res) => {
+router.post("/login", validateUserPayload, checkExistingUser, (req, res) => {
   res.end("implement login, please!");
   /*
     IMPLEMENT

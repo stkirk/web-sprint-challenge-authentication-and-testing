@@ -9,7 +9,7 @@ const checkUniqueUsername = (req, res, next) => {
 };
 
 const checkExistingUser = (req, res, next) => {
-  console.log("checking if user exists");
+  console.log("checking if user exists...");
   next();
 };
 
