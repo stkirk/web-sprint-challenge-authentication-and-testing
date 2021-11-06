@@ -67,3 +67,18 @@ describe("[POST] /api/auth/login", () => {
     expect(res.body.message).toBe("invalid credentials");
   });
 });
+
+describe("[GET] /api/jokes", () => {
+  it("responds with 401 token required if no token send in auth headers", async () => {
+    const res = await request(server).get("/api/jokes");
+    expect(res.status).toBe(401);
+    expect(res.body.message).toBe("token required");
+  });
+  it("responds with correct number of jokes on login with valid creds", async () => {
+    const login = await request(server).post("/api/auth/login").send(leto);
+    const res = await request(server)
+      .get("/api/jokes")
+      .set("Authorization", login.body.token);
+    expect(res.body).toHaveLength(3);
+  });
+});
