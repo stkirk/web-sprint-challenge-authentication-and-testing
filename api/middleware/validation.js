@@ -1,4 +1,4 @@
-const db = require("../../data/dbConfig");
+const Users = require("../users/users-model");
 // 4- On FAILED registration due to the `username` being taken,
 // the response body should include a string exactly as follows: "username taken".
 
@@ -8,9 +8,15 @@ const validateUserPayload = (req, res, next) => {
   } else next();
 };
 
-const checkUniqueUsername = (req, res, next) => {
-  console.log("checking for existing user...");
-  next();
+const checkUniqueUsername = async (req, res, next) => {
+  try {
+    const existing = await Users.findBy({ username: req.body.username });
+    if (existing[0]) {
+      next({ status: 422, message: "username taken" });
+    } else next();
+  } catch (err) {
+    next(err);
+  }
 };
 
 const checkExistingUser = (req, res, next) => {
